@@ -3,7 +3,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-public class Robot {
+public abstract class Robot {
     private static int count = 1;
     final private String id;
     private int floor;
@@ -12,7 +12,7 @@ public class Robot {
     final private List<Letter> letters = new ArrayList<>();
 
     public String toString() {
-        return "Id: " + id + " Floor: " + floor + ", Room: " + room + ", #items: " + numItems() + ", Load: " + 0 ;
+        return "Id: " + id + " Floor: " + floor + ", Room: " + room + ", #items: " + numItems() + ", Load: " + 0;
     }
 
     Robot(MailRoom mailroom) {
@@ -60,7 +60,8 @@ public class Robot {
         }
     }
 
-    void tick() {
+    abstract void tick(); //{
+        /*
             Building building = Building.getBuilding();
             if (letters.isEmpty()) {
                 // Return to MailRoom
@@ -83,8 +84,8 @@ public class Robot {
                 } else {
                     move(Building.Direction.UP); // move towards floor
                 }
-            }
-    }
+            }*/
+    //}
 
     public String getId() {
         return id;

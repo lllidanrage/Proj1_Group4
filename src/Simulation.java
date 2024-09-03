@@ -9,7 +9,6 @@ public class Simulation {
     public final int endArrival;
     final public MailRoom mailroom;
     private static int timeout;
-
     private static int deliveredCount = 0;
     private static int deliveredTotalTime = 0;
 
@@ -18,7 +17,11 @@ public class Simulation {
         deliveredCount++;
         deliveredTotalTime += now() - mailItem.myArrival();
     }
-
+    /*Arrival time key of Map
+    Value is a list of Letter(s)
+    at each arrivalTime, if first letter, create new List<Letter>
+    if List already exists at that time, then add Letter to that list
+    */
     void addToArrivals(int arrivalTime, Letter item) {
         System.out.println(item.toString());
         if (waitingToArrive.containsKey(arrivalTime)) {
@@ -53,6 +56,7 @@ public class Simulation {
             int room = random.nextInt(building.NUMROOMS)+1;
             addToArrivals(arrivalTime, new Letter(floor, room, arrivalTime));
         }
+        //This is for the future extension of Parcel delivery functionality
         for (int i = 0; i < numParcels; i++) { // Generate parcels
             int arrivalTime = random.nextInt(endArrival)+1;
             int floor = random.nextInt(building.NUMFLOORS)+1;

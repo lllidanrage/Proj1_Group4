@@ -4,6 +4,7 @@ import static java.lang.String.format;
 
 public class MailRoom {
     public enum Mode {CYCLING, FLOORING}
+    //Eventually change to a List of mailItems, Polymorphism/Protected Variation
     List<Letter>[] waitingForDelivery;
     private final int numRobots;
 
@@ -11,6 +12,10 @@ public class MailRoom {
     List<Robot> activeRobots;
     List<Robot> deactivatingRobots; // Don't treat a robot as both active and idle by swapping directly
 
+    private Mode mode;
+
+    //Already sounds Polymorphic, potential hint
+    //Exit early
     public boolean someItems() {
         for (int i = 0; i < Building.getBuilding().NUMFLOORS; i++) {
             if (!waitingForDelivery[i].isEmpty()) {
@@ -34,7 +39,7 @@ public class MailRoom {
         }
         return floor;
     }
-
+    //Need to change some of this code to incorporate for new floor and column robots
     MailRoom(int numFloors, int numRobots) {
         waitingForDelivery = new List[numFloors];
         for (int i = 0; i < numFloors; i++) {

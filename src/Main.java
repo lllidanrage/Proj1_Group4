@@ -23,6 +23,7 @@ public class Main {
     public static void main(String[] args) {
         String propertiesPath = (args.length > 0) ? args[0] : DEFAULT_PROPERTIES_PATH;
         final Properties properties = loadPropertiesFile(propertiesPath);
+        assert properties != null;
         new Simulation(properties).run();
     }
 }
