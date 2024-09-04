@@ -85,7 +85,7 @@ public class MailRoom {
             if (fwei >= 0) {  // Need an item or items to deliver, starting with earliest
                 Robot robot = idleRobots.remove();
                 loadRobot(fwei, robot);
-                // Room order for left to right deliver
+                // Room order for left to right deliver.
                 robot.sort();
                 activeRobots.add(robot);
                 System.out.println("Dispatch @ " + Simulation.now() +
