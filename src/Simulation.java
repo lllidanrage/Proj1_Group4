@@ -5,28 +5,25 @@ import java.util.concurrent.TimeUnit;
 
 public class Simulation {
     private static final Map<Integer, List<MailItem>> waitingToArrive = new HashMap<>();
-    private static int time = 0;
+    public static int time = 0;
     public final int endArrival;
     final public MailRoom mailroom;
     private static int timeout;
+
     private static int deliveredCount = 0;
     private static int deliveredTotalTime = 0;
 
-    public static void deliver(Letter mailItem) {
+    public static void deliver(MailItem mailItem) {
         System.out.println("Delivered: " + mailItem);
         deliveredCount++;
         deliveredTotalTime += now() - mailItem.myArrival();
     }
-    /*Arrival time key of Map
-    Value is a list of Letter(s)
-    at each arrivalTime, if first letter, create new List<Letter>
-    if List already exists at that time, then add Letter to that list
-    */
     void addToArrivals(int arrivalTime, MailItem item) {
         System.out.println(item.toString());
         if (waitingToArrive.containsKey(arrivalTime)) {
             waitingToArrive.get(arrivalTime).add(item);
-        } else {
+        }
+        else {
             LinkedList<MailItem> items = new LinkedList<>();
             items.add(item);
             waitingToArrive.put(arrivalTime, items);
@@ -49,20 +46,20 @@ public class Simulation {
 
         Building.initialise(numFloors, numRooms);
         Building building = Building.getBuilding();
-        mailroom = new MailRoom(building.NUMFLOORS, numRobots, mode);
-        for (int i = 0; i < numLetters; i++) { //Generate letters
+        mailroom = new MailRoom(building.NUMFLOORS, numRobots, robotCapacity,numRooms,mode);
+
+        for (int i = 0; i < numLetters; i++) {
             int arrivalTime = random.nextInt(endArrival)+1;
             int floor = random.nextInt(building.NUMFLOORS)+1;
             int room = random.nextInt(building.NUMROOMS)+1;
             addToArrivals(arrivalTime, new Letter(floor, room, arrivalTime));
         }
-        //This is for the future extension of Parcel delivery functionality
-        for (int i = 0; i < numParcels; i++) { // Generate parcels
+
+        for (int i = 0; i < numParcels; i++) {
             int arrivalTime = random.nextInt(endArrival)+1;
             int floor = random.nextInt(building.NUMFLOORS)+1;
             int room = random.nextInt(building.NUMROOMS)+1;
             int weight = random.nextInt(maxWeight)+1;
-            // What am I going to do with all these values?
             addToArrivals(arrivalTime, new Parcel(floor, room, arrivalTime,weight));
         }
     }
@@ -70,12 +67,10 @@ public class Simulation {
     public static int now() { return time; }
 
     void step() {
-        // External events
         if (waitingToArrive.containsKey(time))
             mailroom.arrive(waitingToArrive.get(time));
-        // Internal events
         mailroom.tick();
-        }
+    }
 
     void run() {
         while (time++ <= endArrival || mailroom.someItems()) {

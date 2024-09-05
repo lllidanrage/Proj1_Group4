@@ -1,31 +1,26 @@
-public abstract class MailItem implements Comparable<MailItem> {
+public class MailItem implements Comparable<MailItem> {
+    protected final int floor;
+    protected final int room;
 
-    private final int myArrival;
-    private final int myFloor;
-    private final int myRoom;
-
-    protected int myWeight = 0;
-
-    public MailItem(int floor, int room, int arrival) {
-        this.myArrival = arrival;
-        this.myFloor = floor;
-        this.myRoom = room;
+    protected final int arrival;
+    protected int weight = 0;
+    @Override public int compareTo(MailItem i) {
+        int floorDiff = this.floor - i.floor;
+        return (floorDiff == 0) ? this.room - i.room : floorDiff;
     }
 
-    public int compareTo(MailItem other) {
-        return Integer.compare(this.myArrival, other.myArrival);
+    MailItem(int floor, int room, int arrival) {
+        this.floor = floor;
+        this.room = room;
+        this.arrival = arrival;
     }
-    public int myArrival() { return myArrival; }
-    public int myFloor() { return myFloor; }
-    public int myRoom() { return myRoom; }
-    public int myWeight() { return myWeight; }
 
-
-    @Override
     public String toString() {
-        return String.format("Time = %d Floor = %d Room = %d", myArrival, myFloor, myRoom);
+        return "Floor: " + floor + ", Room: " + room + ", Arrival: " + arrival + ", Weight: " + weight;
     }
+
+    int myFloor() { return floor; }
+    int myRoom() { return room; }
+    int myArrival() { return arrival; }
+    int myWeight() { return weight; }
 }
-
-//NOTE, need to update this in classes where Letter was originally used to accommodate for new MailItem
-

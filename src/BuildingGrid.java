@@ -33,12 +33,12 @@ public class BuildingGrid {
         }
         for (int i = 2; i < NUMROOMS+4-2; i++)
             for (int j = 0; j < NUMFLOORS; j++) {
-            objects[j][i] = format(" Rm %d.%d", NUMFLOORS-j, i-1); // door
-        }
+                objects[j][i] = format(" Rm %d.%d", NUMFLOORS-j, i-1); // door
+            }
 
         objects[NUMFLOORS][2] = "Mailroom ...";
 
-                tm = new DefaultTableModel(objects,headings);
+        tm = new DefaultTableModel(objects,headings);
         JTable jt = new JTable(tm);
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
@@ -59,7 +59,7 @@ public class BuildingGrid {
         f.setVisible(true);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        }
+    }
 
     void update(int floor, int room, String s) {
         String sfinal;

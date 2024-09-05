@@ -1,27 +1,36 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
-public abstract class Robot {
+abstract public class Robot {
     private static int count = 1;
     final private String id;
-    private int floor;
-    private int room;
+
+    protected int floor;
+    protected int room;
     final private MailRoom mailroom;
-    final private List<MailItem> items = new ArrayList<>();
+    final protected List<MailItem> items = new ArrayList<>();
+    private int load;
+    protected int remainingCapacity;
 
     public String toString() {
-        return "Id: " + id + " Floor: " + floor + ", Room: " + room + ", #items: " + numItems() + ", Load: " + 0;
+        return "Id: " + id + " Floor: " + floor + ", Room: " + room + ", #items: " + numItems() + ", Load: " + calLoad() ;
     }
 
-    Robot(MailRoom mailroom) {
+    Robot(MailRoom mailroom, int capacity) {
         this.id = "R" + count++;
         this.mailroom = mailroom;
+        this.remainingCapacity = capacity;
     }
 
     int getFloor() { return floor; }
     int getRoom() { return room; }
+    int calLoad() {
+        load = 0;
+        for (MailItem item : items) {
+            load+= item.myWeight();
+        }
+        return load;
+    }
+
     boolean isEmpty() { return items.isEmpty(); }
 
     public void place(int floor, int room) {
@@ -31,7 +40,7 @@ public abstract class Robot {
         this.room = room;
     }
 
-    private void move(Building.Direction direction) {
+    public void move(Building.Direction direction) {
         Building building = Building.getBuilding();
         int dfloor, droom;
         switch (direction) {
@@ -41,7 +50,7 @@ public abstract class Robot {
             case RIGHT -> {dfloor = floor;   droom = room+1;}
             default -> throw new IllegalArgumentException("Unexpected value: " + direction);
         }
-        if (!building.isOccupied(dfloor, droom)) { // If destination is occupied, do nothing
+        if (!building.isOccupied(dfloor, droom)) {
             building.move(floor, room, direction, id);
             floor = dfloor; room = droom;
             if (floor == 0) {
@@ -51,41 +60,18 @@ public abstract class Robot {
         }
     }
 
-    void transfer(Robot robot) {  // Transfers every item assuming receiving robot has capacity
+    void transfer(Robot robot) {
         ListIterator<MailItem> iter = robot.items.listIterator();
         while(iter.hasNext()) {
             MailItem item = iter.next();
-            this.add(item); //Hand it over
+            this.add(item);
+            this.remainingCapacity-= item.myWeight();
             iter.remove();
+            robot.setRemainingCapacity((robot.getRemainingCapacity()+item.myWeight()));
         }
     }
 
-    abstract void tick(); //{
-        /*
-            Building building = Building.getBuilding();
-            if (letters.isEmpty()) {
-                // Return to MailRoom
-                if (room == building.NUMROOMS + 1) { // in right end column
-                    move(Building.Direction.DOWN);  //move towards mailroom
-                } else {
-                    move(Building.Direction.RIGHT); // move towards right end column
-                }
-            } else {
-                // Items to deliver
-                if (floor == letters.getFirst().myFloor()) {
-                    // On the right floor
-                    if (room == letters.getFirst().myRoom()) { //then deliver all relevant items to that room
-                        do {
-                            Simulation.deliver(letters.removeFirst());
-                        } while (!letters.isEmpty() && room == letters.getFirst().myRoom());
-                    } else {
-                        move(Building.Direction.RIGHT); // move towards next delivery
-                    }
-                } else {
-                    move(Building.Direction.UP); // move towards floor
-                }
-            }*/
-    //}
+    abstract void tick();
 
     public String getId() {
         return id;
@@ -101,6 +87,17 @@ public abstract class Robot {
 
     void sort() {
         Collections.sort(items);
+    }
+
+    // $
+    void reverseSort() {Collections.sort(items, Comparator.reverseOrder());}
+
+    public int getRemainingCapacity() {
+        return remainingCapacity;
+    }
+
+    public void setRemainingCapacity(int remainingCapacity) {
+        this.remainingCapacity = remainingCapacity;
     }
 
 }
