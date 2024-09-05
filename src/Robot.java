@@ -9,7 +9,7 @@ public abstract class Robot {
     private int floor;
     private int room;
     final private MailRoom mailroom;
-    final private List<Letter> letters = new ArrayList<>();
+    final private List<MailItem> items = new ArrayList<>();
 
     public String toString() {
         return "Id: " + id + " Floor: " + floor + ", Room: " + room + ", #items: " + numItems() + ", Load: " + 0;
@@ -22,7 +22,7 @@ public abstract class Robot {
 
     int getFloor() { return floor; }
     int getRoom() { return room; }
-    boolean isEmpty() { return letters.isEmpty(); }
+    boolean isEmpty() { return items.isEmpty(); }
 
     public void place(int floor, int room) {
         Building building = Building.getBuilding();
@@ -52,10 +52,10 @@ public abstract class Robot {
     }
 
     void transfer(Robot robot) {  // Transfers every item assuming receiving robot has capacity
-        ListIterator<Letter> iter = robot.letters.listIterator();
+        ListIterator<MailItem> iter = robot.items.listIterator();
         while(iter.hasNext()) {
-            Letter letter = iter.next();
-            this.add(letter); //Hand it over
+            MailItem item = iter.next();
+            this.add(item); //Hand it over
             iter.remove();
         }
     }
@@ -92,15 +92,15 @@ public abstract class Robot {
     }
 
     public int numItems () {
-        return letters.size();
+        return items.size();
     }
 
-    public void add(Letter item) {
-        letters.add(item);
+    public void add(MailItem item) {
+        items.add(item);
     }
 
     void sort() {
-        Collections.sort(letters);
+        Collections.sort(items);
     }
 
 }

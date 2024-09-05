@@ -4,7 +4,9 @@ public abstract class MailItem implements Comparable<MailItem> {
     private final int myFloor;
     private final int myRoom;
 
-    public MailItem(int arrival, int floor, int room) {
+    protected int myWeight = 0;
+
+    public MailItem(int floor, int room, int arrival) {
         this.myArrival = arrival;
         this.myFloor = floor;
         this.myRoom = room;
@@ -16,6 +18,8 @@ public abstract class MailItem implements Comparable<MailItem> {
     public int myArrival() { return myArrival; }
     public int myFloor() { return myFloor; }
     public int myRoom() { return myRoom; }
+    public int myWeight() { return myWeight; }
+
 
     @Override
     public String toString() {

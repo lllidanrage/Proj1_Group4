@@ -1,14 +1,14 @@
 public class Parcel extends MailItem{
-    private final int weight;
-    public Parcel(int arrival, int floor, int room, int weight) {
-        super(arrival, floor, room);
-        this.weight = weight;
+
+    public Parcel( int floor, int room, int arrival,int weight) {
+        super( floor, room,arrival);
+        this.myWeight = weight;
     }
     public int getWeight() {
-        return weight;
+        return myWeight;
     }
 
     public String toString() {
-        return "Parcel: " + super.toString() + " Weight = " + weight;
+        return "Parcel: " + super.toString() + " Weight = " + myWeight;
     }
 }

@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Main {
-    public static final String DEFAULT_PROPERTIES_PATH = "properties/test.properties";
+    public static final String DEFAULT_PROPERTIES_PATH = "Proj1_Group4/properties/test.properties";
 
     public static Properties loadPropertiesFile(String propertiesFile) {
         System.out.println("Working Directory = " + System.getProperty("user.dir"));

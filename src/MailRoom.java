@@ -5,7 +5,7 @@ import static java.lang.String.format;
 public class MailRoom {
     public enum Mode {CYCLING, FLOORING}
     //Eventually change to a List of mailItems, Polymorphism/Protected Variation
-    List<Letter>[] waitingForDelivery;
+    List<MailItem>[] waitingForDelivery;
     private final int numRobots;
 
     Queue<Robot> idleRobots;
@@ -40,7 +40,8 @@ public class MailRoom {
         return floor;
     }
     //Need to change some of this code to incorporate for new floor and column robots
-    MailRoom(int numFloors, int numRobots) {
+    MailRoom(int numFloors, int numRobots,Mode mode) {
+        this.mode = mode;
         waitingForDelivery = new List[numFloors];
         for (int i = 0; i < numFloors; i++) {
             waitingForDelivery[i] = new LinkedList<>();
@@ -48,14 +49,17 @@ public class MailRoom {
         this.numRobots = numRobots;
 
         idleRobots = new LinkedList<>();
-        for (int i = 0; i < numRobots; i++)
-            idleRobots.add(new Robot(MailRoom.this));  // In mailroom, floor/room is not significant
-        activeRobots = new ArrayList<>();
-        deactivatingRobots = new ArrayList<>();
+
+        if (this.mode == Mode.CYCLING) {
+            for (int i = 0; i < numRobots; i++)
+                idleRobots.add(new CyclingRobot(MailRoom.this));  // In mailroom, floor/room is not significant
+            activeRobots = new ArrayList<>();
+            deactivatingRobots = new ArrayList<>();
+        }
     }
 
-    void arrive(List<Letter> items) {
-        for (Letter item : items) {
+    void arrive(List<MailItem> items) {
+        for (MailItem item : items) {
             waitingForDelivery[item.myFloor()-1].add(item);
             System.out.printf("Item: Time = %d Floor = %d Room = %d Weight = %d\n",
                     item.myArrival(), item.myFloor(), item.myRoom(), 0);
@@ -63,18 +67,24 @@ public class MailRoom {
     }
 
     public void tick() { // Simulation time unit
-        for (Robot activeRobot : activeRobots) {
-            System.out.printf("About to tick: " + activeRobot.toString() + "\n"); activeRobot.tick();
+        if(this.mode == Mode.CYCLING){
+            for (Robot activeRobot : activeRobots) {
+                System.out.printf("About to tick: " + activeRobot.toString() + "\n"); activeRobot.tick();
+            }
+            robotDispatch();  // dispatch a robot if conditions are met
+            // These are returning robots who shouldn't be dispatched in the previous step
+            ListIterator<Robot> iter = deactivatingRobots.listIterator();
+            while (iter.hasNext()) {  // In timestamp order
+                Robot robot = iter.next();
+                iter.remove();
+                activeRobots.remove(robot);
+                idleRobots.add(robot);
+            }
+            
+        } else if (this.mode == Mode.FLOORING) {
+            
         }
-        robotDispatch();  // dispatch a robot if conditions are met
-        // These are returning robots who shouldn't be dispatched in the previous step
-        ListIterator<Robot> iter = deactivatingRobots.listIterator();
-        while (iter.hasNext()) {  // In timestamp order
-            Robot robot = iter.next();
-            iter.remove();
-            activeRobots.remove(robot);
-            idleRobots.add(robot);
-        }
+
     }
 
     void robotDispatch() { // Can dispatch at most one robot; it needs to move out of the way for the next
@@ -106,10 +116,10 @@ public class MailRoom {
     }
 
     void loadRobot(int floor, Robot robot) {
-        ListIterator<Letter> iter = waitingForDelivery[floor].listIterator();
+        ListIterator<MailItem> iter = waitingForDelivery[floor].listIterator();
         while (iter.hasNext()) {  // In timestamp order
-            Letter letter = iter.next();
-            robot.add(letter); //Hand it over
+            MailItem item = iter.next();
+            robot.add(item); //Hand it over
             iter.remove();
         }
     }
