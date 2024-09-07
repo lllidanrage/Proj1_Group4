@@ -7,10 +7,10 @@ public class ColumnRobot extends Robot{
 
     void tick(){
         //write the overridden method for tick in here
-        if (!this.items.isEmpty() && this.floor != this.items.get(0).myFloor()) {
+        if (!this.items.isEmpty() && this.floor != this.items.getFirst().myFloor()) {
             this.move(Building.Direction.UP);
         }
-        else if (!this.items.isEmpty() && this.floor == this.items.get(0).myFloor()) {
+        else if (!this.items.isEmpty() && this.floor == this.items.getFirst().myFloor()) {
             // do nothing, just waiting
         }
         else if (this.items.isEmpty() && this.floor != 0) {

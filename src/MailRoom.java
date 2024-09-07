@@ -13,8 +13,8 @@ public class MailRoom {
     List<Robot> deactivatingRobots;
 
     private int robotCapacity;
-    private int numRooms;
-    private Mode mode;
+    private final int numRooms;
+    private final Mode mode;
     private int initial = 0;
 
     public boolean someItems() {
@@ -43,7 +43,6 @@ public class MailRoom {
     }
 
     MailRoom(int numFloors, int numRobots,int robotCapacity, int numRooms, Mode mode) {
-        // $
         this.robotCapacity = robotCapacity;
         this.numRooms = numRooms;
         this.mode = mode;
@@ -73,7 +72,6 @@ public class MailRoom {
     }
 
     void arrive(List<MailItem> items) {
-
         // add item into waitingForDelivery based on the floor number
         for (MailItem item : items) {
             waitingForDelivery[item.myFloor()-1].add(item);

@@ -10,12 +10,12 @@ public class FloorRobot extends Robot{
         this.transferPosition = transferPosition;
     }
 
-    // 0 means 在最左边接收的item， 1 means在最右边接收的item
+    // 0 take left item， 1 take right item
     private int transferPosition = -1;
 
-    private List<Robot> activeRobots;
+    private final List<Robot> activeRobots;
 
-    private int numRooms;
+    private final int numRooms;
 
     FloorRobot(MailRoom mailroom, int capacity, List<Robot> activeRobots, int numRooms, int floor, int room) {
         super(mailroom, capacity);
@@ -25,35 +25,20 @@ public class FloorRobot extends Robot{
         this.room = room;
     }
 
-
-
-    public List<Robot> getActiveRobots() {
-        return activeRobots;
-    }
-
-    public void setActiveRobots(List<Robot> activeRobots) {
-        this.activeRobots = activeRobots;
-    }
-
     public int checkWaiting(Robot ref) {
+        // check there is robot is waiting on current floor.
         int left = 0;
         int right = 0;
-        Robot leftRobot = null;
-        Robot rightRobot = null;
         for (Robot robot : activeRobots) {
             if (robot.floor == ref.floor && !robot.items.isEmpty() && robot.items.getFirst().myFloor() == ref.floor) {
                 if (robot.room == 0) {
                     left = 1;
-                    leftRobot = robot;
                 } else if (robot.room == (numRooms + 1)) {
                     right = 1;
-                    rightRobot = robot;
                 }
             }
         }
 
-        if (ref.getId().equals("R5")) {
-        }
         if (left == 1 && right == 0) {
             return 0;
         } else if (left == 0 && right == 1) {
@@ -106,11 +91,9 @@ public class FloorRobot extends Robot{
             // Items to deliver
             if (this.floor == this.items.getFirst().myFloor() && this.room == this.items.getFirst().myRoom()) {
                 do {
-                    MailItem firstItem = this.items.get(0);
+                    MailItem firstItem = this.items.getFirst();
                     this.remainingCapacity += firstItem.myWeight();
                     Simulation.deliver(this.items.removeFirst());
-
-
                 } while (!this.items.isEmpty() && this.room == this.items.getFirst().myRoom());
             }
             else if (this.getTransferPosition() == 0) {
