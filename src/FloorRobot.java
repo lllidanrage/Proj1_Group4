@@ -3,9 +3,7 @@ import java.util.List;
 
 public class FloorRobot extends Robot{
 
-    public int getTransferPosition() {
-        return transferPosition;
-    }
+    public int getTransferPosition() {return transferPosition;}
 
     public void setTransferPosition(int transferPosition) {
         this.transferPosition = transferPosition;
@@ -26,7 +24,7 @@ public class FloorRobot extends Robot{
         this.room = room;
     }
 
-    public int checkWaiting(Robot ref) {
+    public int isWaiting(Robot ref) {
         // check there is robot is waiting on current floor.
         int left = 0;
         int right = 0;
@@ -49,7 +47,7 @@ public class FloorRobot extends Robot{
             return 0;
         } else if (left == 0 && right == 1) {
             return 1;
-        }else if (left == 1 && right == 1) {
+        }else if (left == 1) {
             if (getEarlyDeli(leftRobot, rightRobot) == 0) {
                 return 0;//right
             }
@@ -84,7 +82,7 @@ public class FloorRobot extends Robot{
         // when there`s nothing in the flooring robot`s bag, the robot will stay or
         // move to column robot to take the item
         if (items.isEmpty()) {
-            if (checkWaiting(this) == 0 && this.room == 1) {
+            if (isWaiting(this) == 0 && this.room == 1) {
                 Robot sourceRobot = null;
                 for (Robot r : activeRobots) {
                     if (r.getId().equals("R1")) {
@@ -97,11 +95,11 @@ public class FloorRobot extends Robot{
                 }
                 this.setTransferPosition(0);
             }
-            else if (checkWaiting(this) == 0 && this.room != 1) {
+            else if (isWaiting(this) == 0 && this.room != 1) {
                 this.move(Building.Direction.LEFT);
             }
 
-            else if (checkWaiting(this) == 1 && this.room == numRooms) {
+            else if (isWaiting(this) == 1 && this.room == numRooms) {
                 Robot sourceRobot = null;
                 for (Robot r : activeRobots) {
                     if (r.getId().equals("R2")) {
@@ -116,7 +114,7 @@ public class FloorRobot extends Robot{
 
             }
 
-            else if (checkWaiting(this) == 1 && this.room != numRooms) {
+            else if (isWaiting(this) == 1 && this.room != numRooms) {
                 this.move(Building.Direction.RIGHT);
             }
         } else {
