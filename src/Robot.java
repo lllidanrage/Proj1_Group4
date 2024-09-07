@@ -1,6 +1,6 @@
 import java.util.*;
 
-abstract public class Robot {
+public abstract class Robot {
     private static int count = 1;
     final private String id;
 
@@ -8,7 +8,6 @@ abstract public class Robot {
     protected int room;
     final private MailRoom mailroom;
     final protected List<MailItem> items = new ArrayList<>();
-    private int load;
     protected int remainingCapacity;
 
     public String toString() {
@@ -24,9 +23,9 @@ abstract public class Robot {
     int getFloor() { return floor; }
     int getRoom() { return room; }
     int calLoad() {
-        load = 0;
+        int load = 0;
         for (MailItem item : items) {
-            load+= item.myWeight();
+            load += item.myWeight();
         }
         return load;
     }
@@ -90,7 +89,8 @@ abstract public class Robot {
     }
 
     // $
-    void reverseSort() {Collections.sort(items, Comparator.reverseOrder());}
+    void reverseSort() {
+        items.sort(Comparator.reverseOrder());}
 
     public int getRemainingCapacity() {
         return remainingCapacity;

@@ -1,4 +1,4 @@
-public class MailItem implements Comparable<MailItem> {
+public abstract class MailItem implements Comparable<MailItem> {
     protected final int floor;
     protected final int room;
 
