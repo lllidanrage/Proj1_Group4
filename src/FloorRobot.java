@@ -1,3 +1,4 @@
+import java.util.Comparator;
 import java.util.List;
 
 public class FloorRobot extends Robot{
@@ -29,12 +30,17 @@ public class FloorRobot extends Robot{
         // check there is robot is waiting on current floor.
         int left = 0;
         int right = 0;
+        Robot rightRobot = null;
+        Robot leftRobot = null;
+
         for (Robot robot : activeRobots) {
             if (robot.floor == ref.floor && !robot.items.isEmpty() && robot.items.getFirst().myFloor() == ref.floor) {
                 if (robot.room == 0) {
                     left = 1;
+                    leftRobot = robot;
                 } else if (robot.room == (numRooms + 1)) {
                     right = 1;
+                    rightRobot = robot;
                 }
             }
         }
@@ -43,8 +49,34 @@ public class FloorRobot extends Robot{
             return 0;
         } else if (left == 0 && right == 1) {
             return 1;
+        }else if (left == 1 && right == 1) {
+            if (getEarlyDeli(leftRobot, rightRobot) == 0) {
+                return 0;//right
+            }
+            else {
+                return 1;//left
+            }
         }
         return -1;
+    }
+
+    public int getEarlyDeli(Robot leftRobot, Robot rightRobot) {
+        List<MailItem> items1 = leftRobot.items;
+        List<MailItem> items2 = rightRobot.items;
+
+        items1.sort(Comparator.comparingInt(MailItem::myArrival));
+        items2.sort(Comparator.comparingInt(MailItem::myArrival));
+
+        int earlyLeft = items1.getFirst().myArrival();
+        int earlyRight = items2.getFirst().myArrival();
+
+        if (earlyLeft < earlyRight) {
+            return 0;
+        }else if (earlyLeft > earlyRight) {
+            return 1;
+        }else {
+            return 0;
+        }
     }
 
     void tick(){
