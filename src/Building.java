@@ -6,7 +6,6 @@ public class Building {
     final public int NUMFLOORS;
     final public int NUMROOMS;
     private boolean[][] occupied;
-    public enum Direction {LEFT, RIGHT, UP, DOWN}
 
     private static BuildingGrid bg;
 

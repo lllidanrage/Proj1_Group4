@@ -6,7 +6,7 @@ public abstract class Robot {
 
     protected int floor;
     protected int room;
-    final private MailRoom mailroom;
+    final protected MailRoom mailroom;
     final protected List<MailItem> items = new ArrayList<>();
     protected int remainingCapacity;
 
@@ -39,7 +39,7 @@ public abstract class Robot {
         this.room = room;
     }
 
-    public void move(Building.Direction direction) {
+    public void move(Direction direction) {
         Building building = Building.getBuilding();
         int dfloor, droom;
         switch (direction) {
@@ -88,7 +88,6 @@ public abstract class Robot {
         Collections.sort(items);
     }
 
-    // $
     void reverseSort() {
         items.sort(Comparator.reverseOrder());}
 

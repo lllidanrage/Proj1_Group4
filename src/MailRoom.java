@@ -2,7 +2,7 @@ import java.util.*;
 import static java.lang.String.format;
 
 public class MailRoom {
-    public enum Mode {CYCLING, FLOORING}
+
     List<MailItem>[] waitingForDelivery;
     private final int numRobots;
 
@@ -15,6 +15,10 @@ public class MailRoom {
     private final int numRooms;
     private final Mode mode;
     private int initial = 0;
+
+    public List<Robot> getActiveRobotsColumn() {
+        return activeRobotsColumn;
+    }
 
     public boolean someItems() {
         for (int i = 0; i < Building.getBuilding().NUMFLOORS; i++) {
@@ -66,7 +70,7 @@ public class MailRoom {
             idleRobots.add(new ColumnRobot(MailRoom.this, robotCapacity));
             Building building = Building.getBuilding();
             for (int i = 0; i < building.NUMFLOORS; i++)
-                activeRobots.add(new FloorRobot(MailRoom.this, robotCapacity,activeRobotsColumn,numRooms,i+1,1));
+                activeRobots.add(new FloorRobot(MailRoom.this, robotCapacity,numRooms,i+1,1));
         }
     }
 

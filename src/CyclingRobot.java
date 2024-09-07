@@ -9,9 +9,9 @@ public class CyclingRobot extends Robot {
             Building building = Building.getBuilding();
             if (items.isEmpty()) {
                 if (room == building.NUMROOMS + 1) {
-                    move(Building.Direction.DOWN);
+                    move(Direction.DOWN);
                 } else {
-                    move(Building.Direction.RIGHT);
+                    move(Direction.RIGHT);
                 }
             }
             else {
@@ -24,11 +24,11 @@ public class CyclingRobot extends Robot {
                         } while (!items.isEmpty() && room == items.getFirst().myRoom());
                     }
                     else {
-                        move(Building.Direction.RIGHT);
+                        move(Direction.RIGHT);
                     }
                 }
                 else {
-                    move(Building.Direction.UP);
+                    move(Direction.UP);
                 }
             }
         }

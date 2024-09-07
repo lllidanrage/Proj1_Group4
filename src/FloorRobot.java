@@ -3,62 +3,64 @@ import java.util.List;
 
 public class FloorRobot extends Robot{
 
-    public int getTransferPosition() {return transferPosition;}
+    public Direction getTransferPosition() {return transferPosition;}
 
-    public void setTransferPosition(int transferPosition) {
+    public void setTransferPosition(Direction transferPosition) {
         this.transferPosition = transferPosition;
     }
 
-    // 0 take left item， 1 take right item
-    private int transferPosition = -1;
-
-    private final List<Robot> activeRobots;
+    private Direction transferPosition = Direction.NONE;
 
     private final int numRooms;
 
-    FloorRobot(MailRoom mailroom, int capacity, List<Robot> activeRobots, int numRooms, int floor, int room) {
+    FloorRobot(MailRoom mailroom, int capacity, int numRooms, int floor, int room) {
         super(mailroom, capacity);
-        this.activeRobots = activeRobots;
         this.numRooms = numRooms;
         this.floor = floor;
         this.room = room;
     }
 
-    public int isWaiting(Robot ref) {
+    /*
+    Check if there are any column robots waiting on both sides.
+     */
+    public Direction isWaiting(Robot ref) {
         // check there is robot is waiting on current floor.
-        int left = 0;
-        int right = 0;
+        boolean left = false;
+        boolean right = false;
         Robot rightRobot = null;
         Robot leftRobot = null;
 
-        for (Robot robot : activeRobots) {
+        for (Robot robot : mailroom.getActiveRobotsColumn()) {
             if (robot.floor == ref.floor && !robot.items.isEmpty() && robot.items.getFirst().myFloor() == ref.floor) {
                 if (robot.room == 0) {
-                    left = 1;
+                    left = true;
                     leftRobot = robot;
                 } else if (robot.room == (numRooms + 1)) {
-                    right = 1;
+                    right = true;
                     rightRobot = robot;
                 }
             }
         }
 
-        if (left == 1 && right == 0) {
-            return 0;
-        } else if (left == 0 && right == 1) {
-            return 1;
-        }else if (left == 1) {
-            if (getEarlyDeli(leftRobot, rightRobot) == 0) {
-                return 0;//right
+        if (left  && !right ) {
+            return Direction.LEFT;
+        } else if (!left  && right ) {
+            return Direction.RIGHT;
+        }else if (left && right ) {
+            if (leftDeliEarlier(leftRobot, rightRobot) == true) {
+                return Direction.LEFT;
             }
             else {
-                return 1;//left
+                return Direction.RIGHT;
             }
         }
-        return -1;
+        return Direction.NONE;
     }
 
-    public int getEarlyDeli(Robot leftRobot, Robot rightRobot) {
+    /*
+    If there are column robots in both left and right side,check items in witch side arrival earlier
+     */
+    public boolean leftDeliEarlier(Robot leftRobot, Robot rightRobot) {
         List<MailItem> items1 = leftRobot.items;
         List<MailItem> items2 = rightRobot.items;
 
@@ -69,11 +71,11 @@ public class FloorRobot extends Robot{
         int earlyRight = items2.getFirst().myArrival();
 
         if (earlyLeft < earlyRight) {
-            return 0;
+            return true;
         }else if (earlyLeft > earlyRight) {
-            return 1;
+            return false;
         }else {
-            return 0;
+            return true;
         }
     }
 
@@ -82,9 +84,9 @@ public class FloorRobot extends Robot{
         // when there`s nothing in the flooring robot`s bag, the robot will stay or
         // move to column robot to take the item
         if (items.isEmpty()) {
-            if (isWaiting(this) == 0 && this.room == 1) {
+            if (isWaiting(this) == Direction.LEFT && this.room == 1) {
                 Robot sourceRobot = null;
-                for (Robot r : activeRobots) {
+                for (Robot r : mailroom.getActiveRobotsColumn()) {
                     if (r.getId().equals("R1")) {
                         sourceRobot = r;
                         break;
@@ -93,15 +95,15 @@ public class FloorRobot extends Robot{
                 if (sourceRobot != null) {
                     this.transfer(sourceRobot);
                 }
-                this.setTransferPosition(0);
+                this.setTransferPosition(Direction.LEFT);
             }
-            else if (isWaiting(this) == 0 && this.room != 1) {
-                this.move(Building.Direction.LEFT);
+            else if (isWaiting(this) == Direction.LEFT && this.room != 1) {
+                this.move(Direction.LEFT);
             }
 
-            else if (isWaiting(this) == 1 && this.room == numRooms) {
+            else if (isWaiting(this) == Direction.RIGHT && this.room == numRooms) {
                 Robot sourceRobot = null;
-                for (Robot r : activeRobots) {
+                for (Robot r : mailroom.getActiveRobotsColumn()) {
                     if (r.getId().equals("R2")) {
                         sourceRobot = r;
                         break;
@@ -110,12 +112,12 @@ public class FloorRobot extends Robot{
                 if (sourceRobot != null) {
                     this.transfer(sourceRobot);
                 }
-                this.setTransferPosition(1);
+                this.setTransferPosition(Direction.RIGHT);
 
             }
 
-            else if (isWaiting(this) == 1 && this.room != numRooms) {
-                this.move(Building.Direction.RIGHT);
+            else if (isWaiting(this) == Direction.RIGHT && this.room != numRooms) {
+                this.move(Direction.RIGHT);
             }
         } else {
             // Items to deliver
@@ -126,11 +128,11 @@ public class FloorRobot extends Robot{
                     Simulation.deliver(this.items.removeFirst());
                 } while (!this.items.isEmpty() && this.room == this.items.getFirst().myRoom());
             }
-            else if (this.getTransferPosition() == 0) {
-                this.move(Building.Direction.RIGHT);
+            else if (this.getTransferPosition() == Direction.LEFT) {
+                this.move(Direction.RIGHT);
             }
-            else if (this.getTransferPosition() == 1) {
-                this.move(Building.Direction.LEFT);
+            else if (this.getTransferPosition() == Direction.RIGHT) {
+                this.move(Direction.LEFT);
             }
         }
     }
