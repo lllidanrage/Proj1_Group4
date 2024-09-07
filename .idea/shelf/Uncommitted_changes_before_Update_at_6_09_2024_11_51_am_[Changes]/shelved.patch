@@ -1,0 +1,54 @@
+Index: src/MailRoom.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import java.util.*;\r\n\r\nimport static java.lang.String.format;\r\n\r\npublic class MailRoom {\r\n    public enum Mode {CYCLING, FLOORING}\r\n    //Eventually change to a List of mailItems, Polymorphism/Protected Variation\r\n    List<Letter>[] waitingForDelivery;\r\n    private final int numRobots;\r\n\r\n    Queue<Robot> idleRobots;\r\n    List<Robot> activeRobots;\r\n    List<Robot> deactivatingRobots; // Don't treat a robot as both active and idle by swapping directly\r\n\r\n    private Mode mode;\r\n\r\n    //Already sounds Polymorphic, potential hint\r\n    //Exit early\r\n    public boolean someItems() {\r\n        for (int i = 0; i < Building.getBuilding().NUMFLOORS; i++) {\r\n            if (!waitingForDelivery[i].isEmpty()) {\r\n                    return true;\r\n            }\r\n        }\r\n        return false;\r\n    }\r\n\r\n    private int floorWithEarliestItem() {\r\n        int floor = -1;\r\n        int earliest = Simulation.now() + 1;\r\n        for (int i = 0; i < Building.getBuilding().NUMFLOORS; i++) {\r\n            if (!waitingForDelivery[i].isEmpty()) {\r\n                int arrival = waitingForDelivery[i].getFirst().myArrival();\r\n                if (earliest > arrival) {\r\n                    floor = i;\r\n                    earliest = arrival;\r\n                }\r\n            }\r\n        }\r\n        return floor;\r\n    }\r\n    //Need to change some of this code to incorporate for new floor and column robots\r\n    MailRoom(int numFloors, int numRobots) {\r\n        waitingForDelivery = new List[numFloors];\r\n        for (int i = 0; i < numFloors; i++) {\r\n            waitingForDelivery[i] = new LinkedList<>();\r\n        }\r\n        this.numRobots = numRobots;\r\n\r\n        idleRobots = new LinkedList<>();\r\n        for (int i = 0; i < numRobots; i++)\r\n            idleRobots.add(new Robot(MailRoom.this));  // In mailroom, floor/room is not significant\r\n        activeRobots = new ArrayList<>();\r\n        deactivatingRobots = new ArrayList<>();\r\n    }\r\n\r\n    void arrive(List<Letter> items) {\r\n        for (Letter item : items) {\r\n            waitingForDelivery[item.myFloor()-1].add(item);\r\n            System.out.printf(\"Item: Time = %d Floor = %d Room = %d Weight = %d\\n\",\r\n                    item.myArrival(), item.myFloor(), item.myRoom(), 0);\r\n        }\r\n    }\r\n\r\n    public void tick() { // Simulation time unit\r\n        for (Robot activeRobot : activeRobots) {\r\n            System.out.printf(\"About to tick: \" + activeRobot.toString() + \"\\n\"); activeRobot.tick();\r\n        }\r\n        robotDispatch();  // dispatch a robot if conditions are met\r\n        // These are returning robots who shouldn't be dispatched in the previous step\r\n        ListIterator<Robot> iter = deactivatingRobots.listIterator();\r\n        while (iter.hasNext()) {  // In timestamp order\r\n            Robot robot = iter.next();\r\n            iter.remove();\r\n            activeRobots.remove(robot);\r\n            idleRobots.add(robot);\r\n        }\r\n    }\r\n\r\n    void robotDispatch() { // Can dispatch at most one robot; it needs to move out of the way for the next\r\n        System.out.println(\"Dispatch at time = \" + Simulation.now());\r\n        // Need an idle robot and space to dispatch (could be a traffic jam)\r\n        if (!idleRobots.isEmpty() && !Building.getBuilding().isOccupied(0,0)) {\r\n            int fwei = floorWithEarliestItem();\r\n            if (fwei >= 0) {  // Need an item or items to deliver, starting with earliest\r\n                Robot robot = idleRobots.remove();\r\n                loadRobot(fwei, robot);\r\n                // Room order for left to right deliver.\r\n                robot.sort();\r\n                activeRobots.add(robot);\r\n                System.out.println(\"Dispatch @ \" + Simulation.now() +\r\n                        \" of Robot \" + robot.getId() + \" with \" + robot.numItems() + \" item(s)\");\r\n                robot.place(0, 0);\r\n            }\r\n        }\r\n    }\r\n\r\n    void robotReturn(Robot robot) {\r\n        Building building = Building.getBuilding();\r\n        int floor = robot.getFloor();\r\n        int room = robot.getRoom();\r\n        assert floor == 0 && room == building.NUMROOMS+1: format(\"robot returning from wrong place - floor=%d, room ==%d\", floor, room);\r\n        assert robot.isEmpty() : \"robot has returned still carrying at least one item\";\r\n        building.remove(floor, room);\r\n        deactivatingRobots.add(robot);\r\n    }\r\n\r\n    void loadRobot(int floor, Robot robot) {\r\n        ListIterator<Letter> iter = waitingForDelivery[floor].listIterator();\r\n        while (iter.hasNext()) {  // In timestamp order\r\n            Letter letter = iter.next();\r\n            robot.add(letter); //Hand it over\r\n            iter.remove();\r\n        }\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/MailRoom.java b/src/MailRoom.java
+--- a/src/MailRoom.java	(revision 4ad7b47e17f1e7871f7eeab3ddeb986139938f5a)
++++ b/src/MailRoom.java	(date 1725503883367)
+@@ -113,5 +113,4 @@
+             iter.remove();
+         }
+     }
+-
+ }
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"VcsDirectoryMappings\">\r\n    <mapping directory=\"$PROJECT_DIR$\" vcs=\"Git\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+--- a/.idea/vcs.xml	(revision 4ad7b47e17f1e7871f7eeab3ddeb986139938f5a)
++++ b/.idea/vcs.xml	(date 1725587484732)
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="VcsDirectoryMappings">
+-    <mapping directory="$PROJECT_DIR$" vcs="Git" />
++    <mapping directory="" vcs="Git" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_22\" default=\"true\" project-jdk-name=\"22\" project-jdk-type=\"JavaSDK\">\r\n    <output url=\"file://$PROJECT_DIR$/out\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 4ad7b47e17f1e7871f7eeab3ddeb986139938f5a)
++++ b/.idea/misc.xml	(date 1725447736655)
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+-  <component name="ProjectRootManager" version="2" languageLevel="JDK_22" default="true" project-jdk-name="22" project-jdk-type="JavaSDK">
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_X" default="true" project-jdk-name="22" project-jdk-type="JavaSDK">
+     <output url="file://$PROJECT_DIR$/out" />
+   </component>
+ </project>
+\ No newline at end of file

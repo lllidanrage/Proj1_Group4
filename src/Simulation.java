@@ -9,7 +9,6 @@ public class Simulation {
     public final int endArrival;
     final public MailRoom mailroom;
     private static int timeout;
-
     private static int deliveredCount = 0;
     private static int deliveredTotalTime = 0;
 
